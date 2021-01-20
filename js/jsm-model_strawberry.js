@@ -18,6 +18,7 @@
                         lightDiffuseColor : [0.9, 0.8, 0.8]
                     };
                     var sourceurl = $(value).data('iiif-model');
+                    var sourcetexture = $(value).data('iiif-image');
                     var browser_supported = JSM.IsWebGLEnabled() && JSM.IsFileApiEnabled();
 
 

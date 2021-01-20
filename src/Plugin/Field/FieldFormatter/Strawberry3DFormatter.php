@@ -37,6 +37,7 @@ class Strawberry3DFormatter extends StrawberryBaseFormatter {
   public static function defaultSettings() {
     return parent::defaultSettings() + [
       'json_key_source' => 'as:model',
+      'json_key_texture_source' => 'as:model',
       'max_width' => 600,
       'max_height' => 400,
       'number_models' => 1,
