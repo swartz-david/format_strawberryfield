@@ -1,15 +1,19 @@
 <?php
 namespace Drupal\format_strawberryfield\Controller;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\format_strawberryfield\Entity\MetadataExposeConfigEntity;
 use Drupal\format_strawberryfield\Entity\MetadataDisplayEntity;
 use Drupal\format_strawberryfield\Tools\IiifHelper;
+use Drupal\search_api\SearchApiException;
 use Drupal\strawberryfield\Controller\StrawberryfieldFlavorDatasourceSearchController;
 use Drupal\strawberryfield\Tools\StrawberryfieldJsonHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class MetadataDisplaySearchController extends
@@ -44,26 +48,28 @@ class MetadataDisplaySearchController extends
    */
   protected $embargoResolver;
 
-  /**
-   * OCR Search Controller using Exposed Metadata Display. Can deal with multiple formats/requests types
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   * @param \Drupal\Core\Entity\ContentEntityInterface $node
-   * @param string $fileuuid
-   * @param string $processor
-   * @param string $format
-   * @param string $page
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   * @throws \Drupal\search_api\SearchApiException
-   */
-  public function searchWithExposedMetadataDisplay(Request $request, ContentEntityInterface $node, MetadataExposeConfigEntity $metadataexposeconfigentity, string $fileuuid = 'all', string $processor = 'ocr', string $format = 'json', string $page = 'all') {
+    /**
+     * OCR Search Controller using Exposed Metadata Display. Can deal with multiple formats/requests types
+     *
+     * @param Request $request
+     * @param ContentEntityInterface $node
+     * @param MetadataExposeConfigEntity $metadataexposeconfigentity
+     * @param string $fileuuid
+     * @param string $processor
+     * @param string $format
+     * @param string $page
+     * @param int $limit
+     * @return Response
+     * @throws PluginException
+     * @throws MissingDataException
+     * @throws SearchApiException
+     */
+  public function searchWithExposedMetadataDisplay(Request $request, ContentEntityInterface $node, MetadataExposeConfigEntity $metadataexposeconfigentity, string $fileuuid = 'all', string $processor = 'ocr', string $format = 'json', string $page = 'all', int $limit = 100) {
     $callback = $request->query->get('callback');
     // remove the call back so we can get a clean response
     $request->query->remove('callback');
     $result = $this->search(
-      $request, $node, $fileuuid, $processor, $format, $page
+      $request, $node, $fileuuid, $processor, $format, $page, $limit
     );
     // No need to process if the original query failed.
     if ($result->isSuccessful()) {
